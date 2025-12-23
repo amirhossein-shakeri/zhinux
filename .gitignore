@@ -1,0 +1,14 @@
+# Exclude service directories (they're submodules)
+zhinux-hello/
+zhinux-platform/
+zhinux-contracts/
+
+# Optional: exclude build artifacts
+*.log
+*.out
+bin/
+dist/
+vendor/
+.env
+.env.local
+.DS_Store
