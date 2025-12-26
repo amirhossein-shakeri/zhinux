@@ -1,5 +1,13 @@
 {
   "protobuf.protoc.path": "/opt/homebrew/bin/protoc",
   "makefile.configureOnOpen": false,
-  "cSpell.words": ["zhinux"]
+  "cSpell.words": ["zhinux"],
+  "runOnSave.commands": [
+    {
+      "match": "\\.proto$",
+      "command": "buf lint",
+      "doNotDisturb": true,
+      "runIn": "terminal"
+    }
+  ]
 }
