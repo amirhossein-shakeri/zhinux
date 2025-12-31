@@ -1,11 +1,13 @@
 {
   "protobuf.protoc.path": "/opt/homebrew/bin/protoc",
+  "protobuf.protoc.options": ["-I${workspaceFolder}/zhinux-contracts"],
+  "proto3.includeDirs": ["${workspaceFolder}/zhinux-contracts"],
   "makefile.configureOnOpen": false,
   "cSpell.words": ["zhinux"],
   "runOnSave.commands": [
     {
       "match": "\\.proto$",
-      "command": "buf lint",
+      "command": "cd zhinux-contracts && buf lint",
       "doNotDisturb": true,
       "runIn": "terminal"
     }

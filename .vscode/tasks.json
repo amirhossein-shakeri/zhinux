@@ -4,10 +4,10 @@
     {
       "label": "Buf: Lint",
       "type": "shell",
-      "command": "buf lint",
+      "command": "cd zhinux-contracts && buf lint",
       "problemMatcher": {
         "owner": "proto",
-        "fileLocation": ["relative", "${workspaceFolder}"],
+        "fileLocation": ["relative", "${workspaceFolder}/zhinux-contracts"],
         "pattern": {
           "regexp": "^(.+):(\\d+):(\\d+):(.+)$",
           "file": 1,
