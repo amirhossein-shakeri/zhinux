@@ -4,7 +4,7 @@
     {
       "label": "Buf: Lint",
       "type": "shell",
-      "command": "cd zhinux-contracts && buf lint",
+      "command": "cd ${workspaceFolder}/zhinux-contracts && buf lint",
       "problemMatcher": {
         "owner": "proto",
         "fileLocation": ["relative", "${workspaceFolder}/zhinux-contracts"],

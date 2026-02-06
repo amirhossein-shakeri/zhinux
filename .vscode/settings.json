@@ -7,7 +7,7 @@
   "runOnSave.commands": [
     {
       "match": "\\.proto$",
-      "command": "cd zhinux-contracts && buf lint",
+      "command": "cd ${workspaceFolder}/zhinux-contracts && buf lint",
       "doNotDisturb": true,
       "runIn": "terminal"
     }

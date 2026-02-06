@@ -1,7 +1,9 @@
 # Exclude service directories (they're submodules)
-zhinux-hello/
-zhinux-platform/
 zhinux-contracts/
+zhinux-hello/
+zhinux-identity/
+zhinux-platform/
+zhinux-user/
 
 # Optional: exclude build artifacts
 *.log
