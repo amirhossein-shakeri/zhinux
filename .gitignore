@@ -1,9 +1,16 @@
 # Exclude service directories (they're submodules)
+zhinux-assets/
+zhinux-calendar/
+zhinux-compliance/
+zhinux-compression/
 zhinux-contracts/
+zhinux-crypto/
 zhinux-hello/
 zhinux-identity/
 zhinux-note/
 zhinux-platform/
+zhinux-ticketing/
+zhinux-time/
 zhinux-user/
 
 # Optional: exclude build artifacts
