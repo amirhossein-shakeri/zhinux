@@ -1,5 +1,5 @@
 # Exclude service directories (they're submodules)
-zhinux-assets/
+zhinux-asset/
 zhinux-calendar/
 zhinux-compliance/
 zhinux-compression/
