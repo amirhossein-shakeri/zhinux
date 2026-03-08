@@ -8,9 +8,18 @@ This is a meta-repository containing documentation and references to individual 
 
 ### Core Repositories
 
-- **[zhinux-hello](https://github.com/amirhossein-shakeri/zhinux-hello)** - Example gRPC service
-- **[zhinux-platform](https://github.com/amirhossein-shakeri/zhinux-platform)** - Shared platform utilities
+- **[zhinux-asset](https://github.com/amirhossein-shakeri/zhinux-asset)** - _TO BE ADDED_
+- **[zhinux-calendar](https://github.com/amirhossein-shakeri/zhinux-calendar)** - _TO BE ADDED_
+- **[zhinux-compliance](https://github.com/amirhossein-shakeri/zhinux-compliance)** - _TO BE ADDED_
 - **[zhinux-contracts](https://github.com/amirhossein-shakeri/zhinux-contracts)** - Protocol definitions and events
+- **[zhinux-crypto](https://github.com/amirhossein-shakeri/zhinux-crypto)** - _TO BE ADDED_
+- **[zhinux-hello](https://github.com/amirhossein-shakeri/zhinux-hello)** - Example gRPC service
+- **[zhinux-identity](https://github.com/amirhossein-shakeri/zhinux-identity)** - _TO BE ADDED_
+- **[zhinux-organization](https://github.com/amirhossein-shakeri/zhinux-organization)** - _TO BE ADDED_
+- **[zhinux-platform](https://github.com/amirhossein-shakeri/zhinux-platform)** - Shared platform utilities
+- **[zhinux-ticketing](https://github.com/amirhossein-shakeri/zhinux-ticketing)** - _TO BE ADDED_
+- **[zhinux-time](https://github.com/amirhossein-shakeri/zhinux-time)** - _TO BE ADDED_
+- **[zhinux-user](https://github.com/amirhossein-shakeri/zhinux-user)** - _TO BE ADDED_
 
 ### Documentation
 
