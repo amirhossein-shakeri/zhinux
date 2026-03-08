@@ -17,6 +17,7 @@ This is a meta-repository containing documentation and references to individual 
 - **[zhinux-identity](https://github.com/amirhossein-shakeri/zhinux-identity)** - _TO BE ADDED_
 - **[zhinux-organization](https://github.com/amirhossein-shakeri/zhinux-organization)** - _TO BE ADDED_
 - **[zhinux-platform](https://github.com/amirhossein-shakeri/zhinux-platform)** - Shared platform utilities
+- **[zhinux-tenant](https://github.com/amirhossein-shakeri/zhinux-tenant)** - _TO BE ADDED_
 - **[zhinux-ticketing](https://github.com/amirhossein-shakeri/zhinux-ticketing)** - _TO BE ADDED_
 - **[zhinux-time](https://github.com/amirhossein-shakeri/zhinux-time)** - _TO BE ADDED_
 - **[zhinux-user](https://github.com/amirhossein-shakeri/zhinux-user)** - _TO BE ADDED_
