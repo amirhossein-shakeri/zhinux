@@ -13,6 +13,7 @@ This is a meta-repository containing documentation and references to individual 
 - **[zhinux-compliance](https://github.com/amirhossein-shakeri/zhinux-compliance)** - _TO BE ADDED_
 - **[zhinux-contracts](https://github.com/amirhossein-shakeri/zhinux-contracts)** - Protocol definitions and events
 - **[zhinux-crypto](https://github.com/amirhossein-shakeri/zhinux-crypto)** - _TO BE ADDED_
+- **[zhinux-db-maintainer](https://github.com/amirhossein-shakeri/zhinux-db-maintainer)** - _TO R&D THINK AND DECIDE ABOUT & TO BE ADDED_
 - **[zhinux-hello](https://github.com/amirhossein-shakeri/zhinux-hello)** - Example gRPC service
 - **[zhinux-identity](https://github.com/amirhossein-shakeri/zhinux-identity)** - _TO BE ADDED_
 - **[zhinux-organization](https://github.com/amirhossein-shakeri/zhinux-organization)** - _TO BE ADDED_
