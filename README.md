@@ -18,7 +18,7 @@ This is a meta-repository containing documentation and references to individual 
 - **[zhinux-hello](https://github.com/amirhossein-shakeri/zhinux-hello)** - Example gRPC service
 - **[zhinux-identity](https://github.com/amirhossein-shakeri/zhinux-identity)** - _TO BE ADDED_
 - **[zhinux-kv](https://github.com/amirhossein-shakeri/zhinux-kv)** - _KEY/VALUE STORE_
-- **[zhinux-organization](https://github.com/amirhossein-shakeri/zhinux-organization)** - _TO BE ADDED_
+- **[zhinux-note](https://github.com/amirhossein-shakeri/zhinux-note)** - _TO BE ADDED_
 - **[zhinux-platform](https://github.com/amirhossein-shakeri/zhinux-platform)** - Shared platform utilities
 - **[zhinux-tenant](https://github.com/amirhossein-shakeri/zhinux-tenant)** - _TO BE ADDED_
 - **[zhinux-ticketing](https://github.com/amirhossein-shakeri/zhinux-ticketing)** - _TO BE ADDED_
