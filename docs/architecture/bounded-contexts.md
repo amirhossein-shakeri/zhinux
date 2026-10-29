@@ -17,19 +17,20 @@ The [gamification context index](#gamification-domain-family-and-context-index) 
 - Module: [`zhinux-gamification`](../../zhinux-gamification/README.md)
 - Domain family: **Engagement & Motivation**.
 
-Gamification interprets authoritative activity from Zhinux business domains to provide game-like experiences across products. It owns its own policies and outcomes; it does not become part of User, Identity & Access, or Booking. The module groups nine dedicated bounded contexts with distinct models and ownership. These boundaries describe domains, not deployments.
+Gamification interprets authoritative activity from Zhinux business domains to provide game-like experiences across products. It owns its own policies and outcomes; it does not become part of User, Identity & Access, or Booking. The module groups ten dedicated bounded contexts with distinct models and ownership. These boundaries describe domains, not deployments.
 
 | Subdomain | Bounded context | Authoritative responsibilities and concepts |
 | --- | --- | --- |
-| Program governance | Programs & Participation | Program, Participant, Enrollment, EligibilityPolicy, RuleVersion; program lifecycle, scope, enrollment, eligibility, and policy publication |
+| Program governance | Programs & Participation | Program, Participant, Enrollment, EligibilityPolicy, RuleVersion, RecurringRewardProgram; program lifecycle, scope, enrollment, eligibility, and policy publication |
 | Progression | Progression | ProgressTrack, XPGrant, ParticipantProgress, LevelCurve, MasteryNode, Streak, Milestone, Unlock; non-spendable experience and advancement |
-| Trust and standing | Reputation | ReputationDimension, ReputationEvidence, ReputationPolicy, ReputationAssessment, ReputationAdjustment; evidence-based standing, disputes, decay, and corrections |
+| Trust and standing | Reputation | ReputationDimension, ReputationEvidence, ReputationPolicy, ReputationAssessment, ReputationAdjustment, TrustDimension, TrustPolicy, TrustAssessment, EvidenceConfidence; evidence-based standing, disputes, decay, and corrections |
 | Recognition | Achievements | AchievementDefinition, AchievementAward, Badge, Title, Collection; qualification, award uniqueness, repeatability, and revocation |
-| Objectives and challenges | Missions | MissionDefinition, MissionRun, Objective, MissionParticipation, Challenge, CooperativeObjective; objective progress, recurrence, limited-time events, and completion |
+| Objectives and challenges | Missions | MissionDefinition, MissionRun, Objective, MissionParticipation, Challenge, CooperativeObjective, CheckIn; objective progress, recurrence, limited-time events, and completion |
 | Competitive play | Competition | Competition, ScoreEntry, Leaderboard, Rank, Season, League, Division, Placement; scoring, cohorts, tie-breaking, finalization, promotion, and demotion |
 | Virtual economy | Virtual Economy | CurrencyDefinition, Wallet, LedgerEntry, Transfer, Hold, ExchangePolicy, ExpiryLot; multiple currencies, balances, spending, transfers, exchange, expiry, and reversals |
-| Reward fulfillment | Rewards & Inventory | RewardDefinition, RewardGrant, Claim, Redemption, InventoryItem, Gift, BoosterActivation; catalog, grants, claims, virtual holdings, gifting, and consumption |
+| Reward fulfillment | Rewards & Inventory | RewardDefinition, RewardGrant, Claim, Redemption, InventoryItem, Gift, BoosterActivation, RecurrencePolicy, RewardWindow, RewardSchedule, RewardTable, RewardSelectionPolicy, CatchUpPolicy, ClaimEntitlement, ClaimRecord; catalog, grants, claims, virtual holdings, gifting, and consumption |
 | Cooperative play | Play Groups | PlayGroup, Clan, Membership, GroupRole, GroupParticipation; game-specific groups, invitations, membership lifecycle, and roster facts |
+| Integrity and consequences | Integrity & Sanctions | IntegritySignal, ViolationCase, PenaltyPolicy, SanctionDecision, PenaltyEffect, Restriction, RestrictionScope, EnforcementRecord, Appeal, DecisionRevision; integrity cases, penalties, temporary restrictions, appeals, and enforcement tracking |
 
 Definitions, scheduled runs, participant progress, and issued awards are different concepts. Referencing the same participant across contexts does not establish a shared aggregate or persistence model. Detailed policies and invariants are in the [module README](../../zhinux-gamification/README.md).
 
@@ -61,6 +62,13 @@ flowchart LR
     Competition -->|Final placements| Rewards
     Rewards -->|Currency operation requests| Economy
     Economy -->|Movement outcomes| Rewards
+    Programs -->|Policy and participation facts| Integrity[Integrity and Sanctions]
+    Source -->|Integrity evidence| Integrity
+    Reputation -->|Qualified assessments for explicit policies| Integrity
+    Integrity -->|Effect requests and revisions| Targets[Affected gamification contexts]
+    Targets -->|Enforcement acknowledgments| Integrity
+    Integrity -->|Authorized external restriction requests| Access[Business or Identity access authority]
+    Access -->|Acceptance and enforcement outcome| Integrity
 ```
 
 Edges identify semantic contracts only. Contexts consume only outcomes enabled by explicit policies. Identity & Access governs authenticated access; it does not calculate XP, reputation, scores, or awards. Programs publishes applicable enrollment/policy facts; each downstream context owns interpretation and enforcement of its local policy. No arrow implies shared storage or a required synchronous dependency.
@@ -72,6 +80,10 @@ Edges identify semantic contracts only. Contexts consume only outcomes enabled b
 | XP | Non-spendable advancement within a Progression track |
 | Level | Advancement classification from XP and a versioned level curve |
 | Reputation | Evidence-based trust, quality, or reliability in a Reputation dimension; independent of XP and levels |
+| Trust factor / confidence | Scoped Reputation assessment / strength of supporting evidence; independent of authentication risk |
+| Recurring reward | Window-based entitlement with explicit selection and claim policies |
+| Penalty / correction | Authorized disciplinary consequence / correction of an invalid prior effect; separate reasons and compensation policies |
+| Restriction | Scoped action limitation with authority, timing, revision, and enforcement state |
 | Score / rank | Competition-specific performance / relative standing; neither is XP or an access role |
 | League / division | Competitive grouping, not a platform role or a customer subscription tier |
 | Virtual currency | Explicitly identified spendable unit governed by Virtual Economy |
@@ -90,13 +102,64 @@ Multiple virtual currencies are a first-class capability:
 - Multi-currency prices identify every required amount. Rewards coordinates redemption, reservations, capture/release, and fulfillment acknowledgment with Virtual Economy and any external benefit owner.
 - Reputation cannot be purchased, transferred, spent, or booster-amplified by default. XP and levels remain distinct from reputation and all currencies.
 
+### Trust, Integrity, and Security Risk
+
+- Reputation owns community/business `TrustDimension`, `TrustPolicy`, `TrustAssessment`, and `EvidenceConfidence`. A trust assessment specializes a reputation assessment, with explicit subject, scope, dimension, standing, confidence, evidence, policy version, and assessment time.
+- Unknown or insufficient evidence is distinct from low trust. Composite trust factors require explicit weights and missing-evidence rules. Check-ins, purchases, XP, levels, and boosters do not automatically confer trust.
+- Integrity & Sanctions owns gamification manipulation evidence, violation cases, sanctions, and appeals. A signal or low standing is not automatically a proven violation; any consequence requires an authorized policy decision.
+- Identity & Access or an external security-risk authority owns account-compromise/authentication risk. Neither reputation nor gamification integrity can silently become platform access policy.
+
+### Recurring and Dynamic Rewards
+
+Recurring Reward Programs span existing contexts; they do not introduce another bounded context.
+
+| Responsibility and concepts | Owner |
+| --- | --- |
+| `RecurringRewardProgram`, audience, enrollment, lifecycle, policy applicability | Programs & Participation |
+| `CheckIn`, activity qualification, recurring missions/runs and their activity windows | Missions |
+| Consecutive attendance, streak freezes, milestones | Progression |
+| Reward-side `RecurrencePolicy`, `RewardWindow`, `RewardSchedule`, `RewardTable`, `RewardSelectionPolicy`, `CatchUpPolicy` | Rewards & Inventory |
+| `ClaimEntitlement`, `ClaimRecord`, selection snapshot, automatic grant or claim, fulfillment | Rewards & Inventory |
+| Multiple currency movements | Virtual Economy |
+
+- Support calendar daily/weekly/monthly/custom schedules, rolling cooldowns, sequential cycles, enrollment-anchored schedules, and streak/cohort-based reward selection under explicit policies.
+- Distinguish qualifying check-ins, automatic recurring entitlements, recurring mission completion, and streak milestones. A weekly membership gift does not need a synthetic mission.
+- Resolve stable windows using authoritative server evaluation, validated activity times, a declared anchor/time zone/week start, half-open boundaries, daylight-saving rules, and late-arrival policy. Switching zones cannot open duplicate entitlements.
+- Define missed-window reset/skip/pause/grace/freeze/catch-up behavior. Missed attendance is not an implicit disciplinary penalty or reputation loss.
+- Select fixed, chosen, or weighted reward bundles at a declared stage and persist the selection/policy snapshot; retries cannot reroll. Bundles may contain multiple currencies and items.
+- Enforce one entitlement per `(tenant, program, reward plan, participant, window, reward slot)` and atomic claims. A policy version change cannot create another claim for the same slot.
+- Rewards owns claim windows; Missions owns qualification windows. Aligned plans reference the authoritative mission window. Restrictions define whether earning/claims are deferred, forfeited, or catch-up eligible, including in-flight fulfillment recovery.
+
+### Penalties and Temporary Access Limitations
+
+Integrity & Sanctions owns the authority, reason, scope, policy, evidence, decision revision, appeal, and requested effects of a gamification sanction. It tracks per-target enforcement acknowledgments. The resource/action owner applies and enforces each effect under its own invariants.
+
+| Penalty or limitation | Applying/enforcing owner |
+| --- | --- |
+| XP deduction / level recalculation | Progression |
+| Qualified reputation reassessment / authorized adjustment | Reputation; prevent circular punishment and double-counting evidence |
+| Score deduction / competition disqualification / placement correction | Competition |
+| Badge/title revocation | Achievements |
+| Currency forfeiture / transfer or spending restriction | Virtual Economy; preserve ledger, hold, balance-floor, and overdraft rules |
+| Item/booster revocation / claim, gifting, or redemption restriction | Rewards & Inventory |
+| Enrollment, mission, or group participation restriction | Programs & Participation, Missions, or Play Groups according to target scope |
+| Booking/publishing/other business capability restriction | The business context owning that capability, under explicit authority |
+| Authentication/session/account restriction | Identity & Access or designated access-policy authority; gamification requests are not direct enforcement |
+
+- Distinguish penalties from corrections, decay, expiry, cooldowns, and unmet eligibility. Each consequence records decision/effect IDs, provenance, and restoration/compensation policy. No implicit real-money charge or bypass of ledger invariants is permitted.
+- A restriction names subject, tenant/program, resource, actions, issuer authority, start/end or review condition, policy version, reason, and decision revision. Temporary restrictions require a finite end or defined review deadline; avoid a global User `is_banned` flag.
+- Evaluate time-bounded effectiveness as `startsAt <= now < endsAt` together with decision status. Expiry must not depend solely on a scheduled event arriving. Pending enforcement is distinct from an applied restriction.
+- Overlapping restrictions compose explicitly. Lifting one cannot lift another; stale delivery cannot reinstate a revoked/newer decision. Appeals and overturned decisions trigger explicit owner-applied restoration/compensation.
+- The action owner enforces restrictions at action acceptance, with declared policy freshness, invalidation, maximum tolerated delay, and behavior when policy state is unavailable. Existing sessions/tokens do not automatically bypass newly effective restrictions.
+- A gamification outage does not create a universal business lockout, but neither can ordinary failure isolation bypass an independently authorized business/security restriction. External access requests require acceptance and application acknowledgments from the authoritative owner.
+
 ### Cross-Module Responsibilities
 
 | Module or domain | Relationship to Gamification |
 | --- | --- |
 | `zhinux-user` | Owns user registry, profile attributes, and user lifecycle; profiles may display composed gamification summaries |
-| `zhinux-identity` | Owns credentials, authentication, and access; gamification unlocks do not automatically become permissions |
-| `zhinux-calendar` | Owns reservations, conflicts, and booking facts; scheduled gatherings stay with Calendar/Booking |
+| `zhinux-identity` | Owns credentials, authentication, account/security access policy; accepts authorized restriction requests and reports enforcement; reputation is not authentication risk |
+| `zhinux-calendar` | Owns reservations, conflicts, booking facts, and enforcement of booking-specific limitations; scheduled gatherings stay with Calendar/Booking |
 | `zhinux-tenant` | Intended tenant authority; detailed ownership/contract still requires definition |
 | `zhinux-asset` | Intended media boundary for badge artwork and reward imagery; gamification owns award meaning and asset references |
 | `zhinux-contracts` | Owns API/event schema location, not gamification business policy or shared aggregates |
@@ -108,11 +171,11 @@ Multiple virtual currencies are a first-class capability:
 
 - Business domains publish facts; gamification evaluates versioned earning, objective, reputation, and scoring policies. Source domains do not need to calculate gamification rewards.
 - Inputs retain source event ID, tenant/program scope, subject, occurrence time, schema version, and causation. Outcomes retain applied policy version and source evidence.
-- Deduplication is scoped to source, rule/version, recipient, and outcome. Duplicate delivery, out-of-order activity, and replay must not duplicate awards, currency movements, or gifts.
+- Event deduplication is scoped to source, rule/version, recipient, and outcome. Stable business uniqueness additionally protects recurring entitlements, claims, sanction effects, and restrictions across rule-version changes. Duplicate delivery, out-of-order activity, and replay must not duplicate awards, currency movements, gifts, or penalties.
 - Definition changes have effective dates and explicit retroactivity rules. Rebuilding projections is distinct from granting new outcomes.
 - Each context defines reversal/compensation semantics, including invalidated reputation evidence, spent/expired rewards, and corrected competition results.
 - Define opt-out, suspension, deletion, retention, leaderboard visibility, roster changes, earning caps, cooldowns, disputes, and manual-adjustment audit reasons.
-- A gamification failure must not invalidate an otherwise valid source-domain action. Cross-context fulfillment tracks durable intent, acknowledgment, and recovery rather than assuming atomic global completion.
+- A gamification failure must not invalidate an otherwise valid source-domain action; independently authorized business/security restrictions still apply under the action owner's declared enforcement policy. Cross-context fulfillment and sanctions track durable intent, per-target acknowledgment, and recovery rather than assuming atomic global completion.
 - No context reads another's tables or imports another's internal model. Cross-context concepts are mapped through published contracts.
 
 The existing Lab 4 flow and its event deferral remain unchanged. These planned contexts do not introduce gamification into that lab's mandatory request path.
