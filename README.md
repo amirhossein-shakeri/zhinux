@@ -15,6 +15,7 @@ This is a meta-repository containing documentation and references to individual 
 - **[zhinux-contracts](https://github.com/amirhossein-shakeri/zhinux-contracts)** - Protocol definitions and events
 - **[zhinux-crypto](https://github.com/amirhossein-shakeri/zhinux-crypto)** - _TO BE ADDED_
 - **[zhinux-db-maintainer](https://github.com/amirhossein-shakeri/zhinux-db-maintainer)** - _TO R&D THINK AND DECIDE ABOUT & TO BE ADDED_
+- **[zhinux-gamification](zhinux-gamification/README.md)** - Planned gamification domains: programs, progression, reputation, achievements, missions, competition, multiple virtual currencies, rewards, and play groups
 - **[zhinux-hello](https://github.com/amirhossein-shakeri/zhinux-hello)** - Example gRPC service
 - **[zhinux-identity](https://github.com/amirhossein-shakeri/zhinux-identity)** - _TO BE ADDED_
 - **[zhinux-kv](https://github.com/amirhossein-shakeri/zhinux-kv)** - _KEY/VALUE STORE_
@@ -28,6 +29,8 @@ This is a meta-repository containing documentation and references to individual 
 ### Documentation
 
 - [Bounded contexts](docs/architecture/bounded-contexts.md) - Context ownership, language, and integration boundaries
+- [Gamification context index](docs/architecture/bounded-contexts.md#gamification-domain-family-and-context-index) - Planned domains, nine bounded contexts, concept ownership, and integration rules
+- [Gamification module](zhinux-gamification/README.md) - Purpose, responsibilities, scope, multi-currency policies, and detailed domain design
 - [Booking user validation ADR](docs/adr/0001-booking-user-validation.md) - Synchronous validation decision for Lab 4
 - [Guides](docs/guides/) - Getting started and development guides
 - [Standards](docs/standards/) - Development standards and best practices

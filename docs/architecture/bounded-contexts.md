@@ -1,12 +1,121 @@
 # Zhinux Bounded Contexts
 
 - Status: Active
-- Last reviewed: 2026-08-03
-- Scope: Lab 4 two-service thin slice and its intended evolution
+- Last reviewed: 2026-10-29
+- Scope: Existing User/Booking boundaries and Lab 4 flow; planned gamification domains and context index
 
 ## Purpose
 
-This document defines ownership, language, and integration rules between the User and Booking bounded contexts. Its primary goal is to let either service change internally without forcing coordinated changes to another service.
+This document defines ownership, language, and integration rules for Zhinux bounded contexts. It preserves the existing User/Booking boundaries and Lab 4 flow, and indexes the planned gamification domain family. Its primary goal is to let contexts evolve independently without transferring domain ownership.
+
+The [gamification context index](#gamification-domain-family-and-context-index) describes domain boundaries and concepts only; it makes no deployment decisions.
+
+## Gamification Domain Family and Context Index
+
+- Status: Planned domain design; no implementation or deployment topology is implied.
+- Reviewed: 2026-10-29
+- Module: [`zhinux-gamification`](../../zhinux-gamification/README.md)
+- Domain family: **Engagement & Motivation**.
+
+Gamification interprets authoritative activity from Zhinux business domains to provide game-like experiences across products. It owns its own policies and outcomes; it does not become part of User, Identity & Access, or Booking. The module groups nine dedicated bounded contexts with distinct models and ownership. These boundaries describe domains, not deployments.
+
+| Subdomain | Bounded context | Authoritative responsibilities and concepts |
+| --- | --- | --- |
+| Program governance | Programs & Participation | Program, Participant, Enrollment, EligibilityPolicy, RuleVersion; program lifecycle, scope, enrollment, eligibility, and policy publication |
+| Progression | Progression | ProgressTrack, XPGrant, ParticipantProgress, LevelCurve, MasteryNode, Streak, Milestone, Unlock; non-spendable experience and advancement |
+| Trust and standing | Reputation | ReputationDimension, ReputationEvidence, ReputationPolicy, ReputationAssessment, ReputationAdjustment; evidence-based standing, disputes, decay, and corrections |
+| Recognition | Achievements | AchievementDefinition, AchievementAward, Badge, Title, Collection; qualification, award uniqueness, repeatability, and revocation |
+| Objectives and challenges | Missions | MissionDefinition, MissionRun, Objective, MissionParticipation, Challenge, CooperativeObjective; objective progress, recurrence, limited-time events, and completion |
+| Competitive play | Competition | Competition, ScoreEntry, Leaderboard, Rank, Season, League, Division, Placement; scoring, cohorts, tie-breaking, finalization, promotion, and demotion |
+| Virtual economy | Virtual Economy | CurrencyDefinition, Wallet, LedgerEntry, Transfer, Hold, ExchangePolicy, ExpiryLot; multiple currencies, balances, spending, transfers, exchange, expiry, and reversals |
+| Reward fulfillment | Rewards & Inventory | RewardDefinition, RewardGrant, Claim, Redemption, InventoryItem, Gift, BoosterActivation; catalog, grants, claims, virtual holdings, gifting, and consumption |
+| Cooperative play | Play Groups | PlayGroup, Clan, Membership, GroupRole, GroupParticipation; game-specific groups, invitations, membership lifecycle, and roster facts |
+
+Definitions, scheduled runs, participant progress, and issued awards are different concepts. Referencing the same participant across contexts does not establish a shared aggregate or persistence model. Detailed policies and invariants are in the [module README](../../zhinux-gamification/README.md).
+
+### Gamification Semantic Context Map
+
+```mermaid
+flowchart LR
+    User[User] -->|Subject lifecycle facts| Programs[Programs and Participation]
+    Tenant[Tenant authority - intended] -->|Tenant lifecycle facts| Programs
+    Source[Booking and other business domains] -->|Qualifying facts| Progress[Progression]
+    Source -->|Qualified evidence| Reputation[Reputation]
+    Source -->|Objective facts| Missions[Missions]
+    Source -->|Scoring facts| Competition[Competition]
+    Programs -->|Published policy and enrollment facts| Progress
+    Programs -->|Published policy and enrollment facts| Reputation
+    Programs -->|Published policy and enrollment facts| Missions
+    Programs -->|Published policy and enrollment facts| Competition
+    Programs -->|Published policy and enrollment facts| Achievements[Achievements]
+    Programs -->|Published policy and enrollment facts| Rewards[Rewards and Inventory]
+    Programs -->|Published policy and enrollment facts| Economy[Virtual Economy]
+    Programs -->|Published policy and enrollment facts| Groups[Play Groups]
+    Progress -->|Milestones| Achievements
+    Reputation -->|Standing assessments| Achievements
+    Missions -->|Completion| Achievements
+    Groups -->|Roster facts| Missions
+    Groups -->|Roster facts| Competition
+    Achievements -->|Awards| Rewards
+    Missions -->|Completion| Rewards
+    Competition -->|Final placements| Rewards
+    Rewards -->|Currency operation requests| Economy
+    Economy -->|Movement outcomes| Rewards
+```
+
+Edges identify semantic contracts only. Contexts consume only outcomes enabled by explicit policies. Identity & Access governs authenticated access; it does not calculate XP, reputation, scores, or awards. Programs publishes applicable enrollment/policy facts; each downstream context owns interpretation and enforcement of its local policy. No arrow implies shared storage or a required synchronous dependency.
+
+### Gamification Language and Currency Rules
+
+| Concept | Meaning and boundary |
+| --- | --- |
+| XP | Non-spendable advancement within a Progression track |
+| Level | Advancement classification from XP and a versioned level curve |
+| Reputation | Evidence-based trust, quality, or reliability in a Reputation dimension; independent of XP and levels |
+| Score / rank | Competition-specific performance / relative standing; neither is XP or an access role |
+| League / division | Competitive grouping, not a platform role or a customer subscription tier |
+| Virtual currency | Explicitly identified spendable unit governed by Virtual Economy |
+| Points / stars | Display labels; classify explicitly as advancement, score, recognition, or currency |
+| Skill / mastery | Gamified progression; actual competencies and credentials remain with their external authorities |
+| Event | Qualify as integration event, gamification event/run, or scheduled gathering |
+| Clan / collaboration | Game-specific Play Group or cooperative mission; general communities and business collaboration remain external |
+
+Multiple virtual currencies are a first-class capability:
+
+- Identify a currency by tenant-scoped immutable ID with a tenant-unique code, precision, lifecycle, and versioned economic policy. Names such as gems, coins, and stars are presentation metadata, not interchangeable units.
+- Identify a wallet account by tenant, economy scope, participant, and currency ID. Economy scope determines whether a balance is isolated to one program or explicitly shared by named programs within the tenant.
+- Maintain independent balances and policies for issuance, spending, transfers, holds, expiry, caps, balance limits, and overdrafts. Never sum or substitute different currencies implicitly.
+- Use exact amount arithmetic and immutable, traceable ledger movements. Available balances account for holds; refunds and corrections append compensating movements.
+- Currency exchange requires an explicit pair policy and recorded quote/rate, rounding, fees, limits, and coordinated debit/credit outcome. Exchange is not implied by supporting multiple currencies.
+- Multi-currency prices identify every required amount. Rewards coordinates redemption, reservations, capture/release, and fulfillment acknowledgment with Virtual Economy and any external benefit owner.
+- Reputation cannot be purchased, transferred, spent, or booster-amplified by default. XP and levels remain distinct from reputation and all currencies.
+
+### Cross-Module Responsibilities
+
+| Module or domain | Relationship to Gamification |
+| --- | --- |
+| `zhinux-user` | Owns user registry, profile attributes, and user lifecycle; profiles may display composed gamification summaries |
+| `zhinux-identity` | Owns credentials, authentication, and access; gamification unlocks do not automatically become permissions |
+| `zhinux-calendar` | Owns reservations, conflicts, and booking facts; scheduled gatherings stay with Calendar/Booking |
+| `zhinux-tenant` | Intended tenant authority; detailed ownership/contract still requires definition |
+| `zhinux-asset` | Intended media boundary for badge artwork and reward imagery; gamification owns award meaning and asset references |
+| `zhinux-contracts` | Owns API/event schema location, not gamification business policy or shared aggregates |
+| `zhinux-platform` / `zhinux-kv` | Technical utilities / intended storage capability; neither becomes owner of progress, reputation, or balances |
+| Learning/Skills, Community/Organization, Commerce/Payments, Fulfillment | External domain boundaries for real competencies, general groups, money, and actual benefits; not new modules established by this map |
+| Notifications / Analytics | External consumers for delivery and analysis; those capabilities are not assigned to an existing placeholder module here |
+
+### Integration, Corrections, and Lifecycle
+
+- Business domains publish facts; gamification evaluates versioned earning, objective, reputation, and scoring policies. Source domains do not need to calculate gamification rewards.
+- Inputs retain source event ID, tenant/program scope, subject, occurrence time, schema version, and causation. Outcomes retain applied policy version and source evidence.
+- Deduplication is scoped to source, rule/version, recipient, and outcome. Duplicate delivery, out-of-order activity, and replay must not duplicate awards, currency movements, or gifts.
+- Definition changes have effective dates and explicit retroactivity rules. Rebuilding projections is distinct from granting new outcomes.
+- Each context defines reversal/compensation semantics, including invalidated reputation evidence, spent/expired rewards, and corrected competition results.
+- Define opt-out, suspension, deletion, retention, leaderboard visibility, roster changes, earning caps, cooldowns, disputes, and manual-adjustment audit reasons.
+- A gamification failure must not invalidate an otherwise valid source-domain action. Cross-context fulfillment tracks durable intent, acknowledgment, and recovery rather than assuming atomic global completion.
+- No context reads another's tables or imports another's internal model. Cross-context concepts are mapped through published contracts.
+
+The existing Lab 4 flow and its event deferral remain unchanged. These planned contexts do not introduce gamification into that lab's mandatory request path.
 
 ## Lab 4 Simplification
 
